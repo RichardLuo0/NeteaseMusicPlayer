@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="music">音乐</string>
+    <string name="ablum">专辑</string>
+    <string name="play_list">播放列表</string>
+</resources>
