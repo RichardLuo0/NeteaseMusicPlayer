@@ -25,7 +25,11 @@ public class UiUtils {
         }
     }
 
-    public static <T extends RecyclerView.ViewHolder, U> void bindRecyclerViewViewWithLiveData(LifecycleOwner owner, RecyclerView view, LiveData<List<U>> liveData, Bindable<T, U> bindable) {
+   public interface Identifiable {
+        int getId();
+    }
+
+    public static <T extends RecyclerView.ViewHolder, U extends Identifiable> void bindRecyclerViewViewWithLiveData(LifecycleOwner owner, RecyclerView view, LiveData<List<U>> liveData, Bindable<T, U> bindable) {
         RecyclerView.Adapter<T> adapter = new RecyclerView.Adapter<T>() {
 
             @NonNull
@@ -46,7 +50,14 @@ public class UiUtils {
                 List<U> list = liveData.getValue();
                 return list != null ? list.size() : 0;
             }
+
+            @Override
+            public long getItemId(int position) {
+                List<U> list = liveData.getValue();
+                return list != null ? list.get(position).getId() : 0;
+            }
         };
+        adapter.setHasStableIds(true);
         view.setAdapter(adapter);
         liveData.observe(owner, list -> {
             adapter.notifyDataSetChanged();

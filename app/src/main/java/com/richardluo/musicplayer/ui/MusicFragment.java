@@ -1,6 +1,7 @@
 package com.richardluo.musicplayer.ui;
 
 import android.os.Bundle;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.entity.Music;
 import com.richardluo.musicplayer.ui.component.NetworkImageView;
@@ -20,27 +22,23 @@ import com.richardluo.musicplayer.utils.Logger;
 import com.richardluo.musicplayer.utils.UiUtils;
 import com.richardluo.musicplayer.viewModel.CustomViewModelProvider;
 import com.richardluo.musicplayer.viewModel.HomeViewModel;
+import com.richardluo.musicplayer.viewModel.MusicViewModel;
 
 public class MusicFragment extends Fragment {
 
-    int type;
-    private HomeViewModel viewModel;
+    private HomeViewModel homeViewModel;
+    private MusicViewModel musicViewModel;
 
     private SwipeRefreshLayout refreshLayout;
 
-    public static MusicFragment newInstance(int type) {
-        Bundle args = new Bundle();
-        args.putInt("page", type);
-        MusicFragment fragment = new MusicFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private final MaterialSharedAxis sharedAxis = new MaterialSharedAxis(MaterialSharedAxis.Y, true);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new CustomViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new CustomViewModelProvider(getActivity()).get(HomeViewModel.class);
+        musicViewModel = new CustomViewModelProvider(this).get(MusicViewModel.class);
 
         Logger.addOnException(this, e -> {
             if (refreshLayout != null) refreshLayout.setRefreshing(false);
@@ -69,14 +67,14 @@ public class MusicFragment extends Fragment {
         refreshLayout = root.findViewById(R.id.refresh);
         RecyclerView grid = root.findViewById(R.id.grid);
         // Keep space for navigation bar
-        UiUtils.setSystemPadding(root, UiUtils.SystemPadding.BOTTOM);
+        UiUtils.setSystemPadding(grid, UiUtils.SystemPadding.BOTTOM);
 
         initGrid(refreshLayout, grid);
         return root;
     }
 
     protected void initGrid(SwipeRefreshLayout refreshLayout, RecyclerView grid) {
-        UiUtils.bindRecyclerViewViewWithLiveData(this, grid, viewModel.getMusicList(), new UiUtils.Bindable<MusicViewHolder, Music>() {
+        UiUtils.bindRecyclerViewViewWithLiveData(this, grid, musicViewModel.getMusicList(), new UiUtils.Bindable<MusicViewHolder, Music>() {
             @Override
             protected MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View v = LayoutInflater.from(parent.getContext())
@@ -89,17 +87,29 @@ public class MusicFragment extends Fragment {
                 holder.name.setText(music.getName());
                 if (music.getArtist() != null)
                     holder.artist.setText(music.getArtist().getName());
-                holder.imageView.setImage(music.getPicUrl(), R.drawable.ic_round_music_note,1900,1400);
-                holder.root.setOnClickListener(v -> viewModel.setPlayingMusic(music));
+                holder.imageView.setImage(music.getPicUrl(), R.drawable.ic_round_music_note, 1900, 1400);
+                holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(music));
             }
 
             @Override
             protected void onUpdate() {
-                refreshLayout.setRefreshing(false);
+                onDataReady(grid);
             }
         });
-        viewModel.refreshMusicList();
+        refreshData(grid);
+        refreshLayout.setOnRefreshListener(() -> refreshData(grid));
+    }
 
-        refreshLayout.setOnRefreshListener(() -> viewModel.refreshMusicList());
+    private void refreshData(RecyclerView grid) {
+        TransitionManager.beginDelayedTransition(refreshLayout, sharedAxis);
+        grid.setVisibility(View.INVISIBLE);
+        musicViewModel.refreshMusicList();
+        refreshLayout.setRefreshing(true);
+    }
+
+    private void onDataReady(RecyclerView grid) {
+        TransitionManager.beginDelayedTransition(refreshLayout, sharedAxis);
+        grid.setVisibility(View.VISIBLE);
+        refreshLayout.setRefreshing(false);
     }
 }

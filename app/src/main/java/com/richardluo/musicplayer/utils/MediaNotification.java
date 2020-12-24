@@ -18,7 +18,6 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import androidx.core.app.TaskStackBuilder;
 import androidx.media.app.NotificationCompat;
 import androidx.media.session.MediaButtonReceiver;
 
@@ -36,6 +35,8 @@ public class MediaNotification {
     private Notification notification;
     private final NotificationManager notificationManager;
 
+    private boolean isPlaying = false;
+
     public MediaNotification(Context context, MediaSessionCompat mediaSession) {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mediaStyle = new androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.getSessionToken())
@@ -50,7 +51,11 @@ public class MediaNotification {
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
                 super.onPlaybackStateChanged(state);
-                updateNotification(context, state.getState() == PlaybackStateCompat.STATE_PLAYING);
+                boolean realPlayingState = state.getState() == PlaybackStateCompat.STATE_PLAYING;
+                if (isPlaying != realPlayingState) {
+                    updateNotification(context, state.getState() == PlaybackStateCompat.STATE_PLAYING);
+                    isPlaying = realPlayingState;
+                }
             }
 
             @Override
@@ -101,9 +106,8 @@ public class MediaNotification {
                 .setLargeIcon(bitmap != null ? bitmap : description.getIconBitmap())
                 .setStyle(mediaStyle)
                 .setSmallIcon(R.drawable.ic_round_music_note)
-                .setContentIntent(TaskStackBuilder.create(context)
-                        .addNextIntentWithParentStack(new Intent(context, MainActivity.class))
-                        .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(PendingIntent
+                        .getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(new androidx.core.app.NotificationCompat.Action(
                         R.drawable.ic_outline_skip_previous,
                         "pre",
@@ -125,7 +129,7 @@ public class MediaNotification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "播放通知";
             String description = "播放通知";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);

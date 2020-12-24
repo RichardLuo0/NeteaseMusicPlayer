@@ -21,7 +21,7 @@ import retrofit2.internal.EverythingIsNonNull;
 
 
 public class NeteaseService {
-    public final static String SERVER_ADDRESS = "http://192.168.43.107:3000";
+    public final static String SERVER_ADDRESS = "http://10.0.2.2:3000";
 
     private static INeteaseService instance;
 

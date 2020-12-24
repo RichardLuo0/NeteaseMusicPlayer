@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -44,7 +45,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
 
     private ExoPlayer exoPlayer;
     private MediaNotification mediaNotification;
-    private final Queue<Music> playList = new LinkedList<>();
+    private final Queue<Music> playQueue = new LinkedList<>();
 
     MediaSessionCompat.Callback mediaSessionCallback = new MediaSessionCompat.Callback() {
         AudioFocusRequestCompat audioFocusRequest;
@@ -161,14 +162,14 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
     }
 
     protected void addMusic(Music music, Uri uri) {
-        playList.add(music);
+        playQueue.add(music);
         exoPlayer.addMediaItem(MediaItem.fromUri(uri));
         setMetadata(music);
     }
 
     protected void setMusic(Music music, Uri uri) {
-        playList.clear();
-        playList.add(music);
+        playQueue.clear();
+        playQueue.add(music);
         exoPlayer.setMediaItem(MediaItem.fromUri(uri));
         setMetadata(music);
     }
@@ -214,7 +215,9 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
     protected void updateProgressBar() {
         //Remove scheduled updates.
         handler.removeCallbacks(this::updateProgressBar);
-        if (exoPlayer != null && exoPlayer.isPlaying()) {
+        if (exoPlayer == null)
+            return;
+        if (exoPlayer.isPlaying()) {
             setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
             //Schedule an update
             int playbackState = exoPlayer == null ? Player.STATE_IDLE : exoPlayer.getPlaybackState();

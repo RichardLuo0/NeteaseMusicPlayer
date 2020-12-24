@@ -3,11 +3,12 @@ package com.richardluo.musicplayer.entity;
 import com.richardluo.musicplayer.model.Callback;
 import com.richardluo.musicplayer.model.NeteaseService;
 import com.richardluo.musicplayer.utils.RunnableWithArg;
+import com.richardluo.musicplayer.utils.UiUtils;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Music implements Serializable {
+public class Music implements Serializable, UiUtils.Identifiable {
     int id;
     String name;
     String picUrl;

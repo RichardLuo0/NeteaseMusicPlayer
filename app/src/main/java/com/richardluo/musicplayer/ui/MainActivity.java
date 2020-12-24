@@ -9,7 +9,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -19,11 +18,13 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.tabs.TabLayout;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.ui.component.MusicPlayerView;
+import com.richardluo.musicplayer.utils.Logger;
 import com.richardluo.musicplayer.viewModel.CustomViewModelProvider;
 import com.richardluo.musicplayer.viewModel.HomeViewModel;
 
@@ -32,6 +33,7 @@ public class MainActivity extends BaseActivity {
     private HomeViewModel viewModel;
     private BottomSheetBehavior<?> bottomSheetBehavior;
     MusicPlayerView musicPlayerView;
+    private FloatingActionButton addButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,8 @@ public class MainActivity extends BaseActivity {
         viewModel = new CustomViewModelProvider(this).get(HomeViewModel.class);
 
         MaterialToolbar appBar = findViewById(R.id.appBar);
+        addButton = findViewById(R.id.add_button);
+        addButton.hide();
         setSupportActionBar(appBar);
         // app bar text disappear gradually when scrolling
         ((AppBarLayout) findViewById(R.id.appbarLayout)).addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
@@ -56,21 +60,25 @@ public class MainActivity extends BaseActivity {
     }
 
     static class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        @StringRes
-        private final int[] tabs;
         private final Context mContext;
 
-        public SectionsPagerAdapter(Context context, FragmentManager fm, int[] tabs) {
+        private final int[] tabs = new int[]{R.string.music, R.string.ablum, R.string.play_list};
+        private final Class<?>[] fragmentClass = new Class<?>[]{MusicFragment.class, AlbumFragment.class, PlayListFragment.class};
+
+        public SectionsPagerAdapter(Context context, FragmentManager fm) {
             super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             mContext = context;
-            this.tabs = tabs;
         }
 
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return MusicFragment.newInstance(position);
+            try {
+                return (Fragment) fragmentClass[position].newInstance();
+            } catch (Exception e) {
+                Logger.error("Fragment init fail", e);
+            }
+            return new Fragment();
         }
 
         @Nullable
@@ -87,9 +95,25 @@ public class MainActivity extends BaseActivity {
 
     protected void initViewPager() {
         ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(new SectionsPagerAdapter(this, getSupportFragmentManager(), new int[]{R.string.music, R.string.ablum, R.string.play_list}));
+        viewPager.setAdapter(new SectionsPagerAdapter(this, getSupportFragmentManager()));
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 2)
+                    addButton.show();
+                else addButton.hide();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     protected void initBottomSheet() {

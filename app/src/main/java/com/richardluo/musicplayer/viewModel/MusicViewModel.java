@@ -10,15 +10,15 @@ import com.richardluo.musicplayer.model.RepoProvider;
 
 import java.util.List;
 
-public class HomeViewModel extends ViewModel {
+public class MusicViewModel extends ViewModel {
 
-    private final MutableLiveData<Music> playingMusic = new MutableLiveData<>();
+    private final MutableLiveData<List<Music>> musicList = new MutableLiveData<>();
 
-    public void setPlayingMusic(Music music) {
-        playingMusic.postValue(music);
+    public void refreshMusicList() {
+        RepoProvider.get(MusicRepo.class).getHotMusic(musicList);
     }
 
-    public LiveData<Music> getPlayingMusic() {
-        return playingMusic;
+    public LiveData<List<Music>> getMusicList() {
+        return musicList;
     }
 }
