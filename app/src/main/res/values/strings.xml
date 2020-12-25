@@ -8,7 +8,7 @@
     <string-array name="preference_navigation_style">
         <item>Tab bar</item>
         <item>Bottom navigation</item>
-        <item>Side bar</item>
+        <item>Drawer</item>
     </string-array>
     <string-array name="preference_navigation_style_value">
         <item>0</item>
@@ -16,4 +16,19 @@
         <item>2</item>
     </string-array>
     <string name="settings">Settings</string>
+    <string name="preference_color">Theme color</string>
+    <string-array name="preference_color">
+        <item>Indigo</item>
+        <item>Purple</item>
+        <item>Red</item>
+        <item>Teal</item>
+    </string-array>
+    <string-array name="preference_color_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 </resources>

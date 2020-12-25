@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -21,25 +20,27 @@ import com.google.android.material.textview.MaterialTextView;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.entity.Music;
 import com.richardluo.musicplayer.service.MusicPlayerService;
-import com.richardluo.musicplayer.utils.UiUtils;
+import com.richardluo.musicplayer.utils.RunnableWithArg;
 import com.richardluo.musicplayer.utils.UnixTimeFormat;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 
 public class MusicPlayerView {
     private final Activity activity;
     private final MediaBrowserCompat mediaBrowser;
     private MediaControllerCompat mediaController;
+    private final ArrayList<RunnableWithArg<MediaControllerCompat>> pendingControl = new ArrayList<>();
     private MediaBrowserCompat.ConnectionCallback connectionCallback;
     private MediaControllerCompat.Callback controllerCallback;
 
-    private final View miniPlayer;
+    private View miniPlayer;
     private NetworkImageView miniPlayerImageView;
     private MaterialTextView miniPlayerTextView;
     private ImageButton miniPlayerButton;
     private ProgressBar miniPlayerProgressBar;
 
-    private final View expandedPlayer;
+    private View expandedPlayer;
     private NetworkImageView playerImageView;
     private MaterialTextView playerTextView;
     private MaterialTextView playerArtistTextView;
@@ -60,8 +61,6 @@ public class MusicPlayerView {
 
     public MusicPlayerView(Activity activity, View miniPlayer, View expandedPlayer) {
         this.activity = activity;
-        this.miniPlayer = miniPlayer;
-        this.expandedPlayer = expandedPlayer;
         initControllerCallback();
         initConnectionCallback();
         mediaBrowser = new MediaBrowserCompat(activity,
@@ -69,6 +68,15 @@ public class MusicPlayerView {
                 connectionCallback,
                 null);
         mediaBrowser.connect();
+        bindView(miniPlayer, expandedPlayer);
+    }
+
+    public void bindView(View miniPlayer, View expandedPlayer) {
+        this.miniPlayer = miniPlayer;
+        this.expandedPlayer = expandedPlayer;
+        // Init UI
+        initMiniPlayer();
+        initExpandPlayer();
     }
 
     protected void initControllerCallback() {
@@ -116,17 +124,17 @@ public class MusicPlayerView {
                 mediaController = new MediaControllerCompat(activity, token);
                 // Save the controller
                 MediaControllerCompat.setMediaController(activity, mediaController);
-                // Init UI
-                initMiniPlayer();
-                initExpandPlayer();
                 // Register callback to stay in sync
                 mediaController.registerCallback(controllerCallback);
+
+                for (RunnableWithArg<MediaControllerCompat> runnable : pendingControl) {
+                    runnable.run(mediaController);
+                }
             }
         };
     }
 
     protected void initMiniPlayer() {
-        UiUtils.setSystemPadding(miniPlayer.findViewById(R.id.player_horizontal_view), UiUtils.SystemPadding.BOTTOM);
         miniPlayerImageView = miniPlayer.findViewById(R.id.mini_player_image);
         miniPlayerTextView = miniPlayer.findViewById(R.id.mini_player_name);
         miniPlayerButton = miniPlayer.findViewById(R.id.mini_player_play_button);
@@ -176,16 +184,27 @@ public class MusicPlayerView {
             this.music = music;
             Bundle bundle = new Bundle();
             bundle.putSerializable("music", music);
-            music.getPlayUrl(url -> mediaController.getTransportControls().prepareFromUri(Uri.parse(url), bundle));
+            music.getPlayUrl(url -> {
+                RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().prepareFromUri(Uri.parse(url), bundle);
+                if (mediaController == null)
+                    pendingControl.add(runnable);
+                else runnable.run(mediaController);
+            });
         }
     }
 
     public void play() {
-        mediaController.getTransportControls().play();
+        RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().play();
+        if (mediaController == null)
+            pendingControl.add(runnable);
+        else runnable.run(mediaController);
     }
 
     public void pause() {
-        mediaController.getTransportControls().pause();
+        RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().pause();
+        if (mediaController == null)
+            pendingControl.add(runnable);
+        else runnable.run(mediaController);
     }
 
     protected long getDuration() {

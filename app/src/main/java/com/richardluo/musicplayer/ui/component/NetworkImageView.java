@@ -40,7 +40,9 @@ public class NetworkImageView extends ShapeableImageView {
     }
 
     public void setImage(Uri uri, int placeholder) {
-        setImage(uri, placeholder, getWidth(), getHeight());
+        if (getWidth() > 0 && getHeight() > 0)
+            setImage(uri, placeholder, getWidth(), getHeight());
+        else setImage(uri, placeholder, 1920, 1080);
     }
 
     public void setImage(Uri uri, int placeholder, int width, int height) {

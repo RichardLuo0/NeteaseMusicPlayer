@@ -1,5 +1,6 @@
 package com.richardluo.musicplayer.utils;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,7 +26,7 @@ public class UiUtils {
         }
     }
 
-   public interface Identifiable {
+    public interface Identifiable {
         int getId();
     }
 
@@ -106,5 +107,17 @@ public class UiUtils {
                 throw new IllegalStateException("Unexpected value: " + systemPadding);
         }
         view.setOnApplyWindowInsetsListener(listener);
+    }
+
+    public static void setWidth(View view, int value) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        params.width = value;
+        view.setLayoutParams(params);
+    }
+
+    public static void setHeight(Context context,View view, int value) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        params.height = (int) (value * context.getResources().getDisplayMetrics().density);
+        view.setLayoutParams(params);
     }
 }

@@ -9,7 +9,10 @@
     <string-array name="preference_navigation_style">
         <item>标签栏</item>
         <item>底部导航</item>
-        <item>侧边栏</item>
+        <item>侧滑栏</item>
     </string-array>
     <string name="settings">设置</string>
+    <string name="preference_color">主题色</string>
+    <string name="drawer_open">打开</string>
+    <string name="drawer_close">关闭</string>
 </resources>

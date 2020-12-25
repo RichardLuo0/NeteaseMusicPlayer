@@ -8,5 +8,13 @@
             app:key="navigation_style"
             app:title="@string/preference_navigation"
             app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="0"
+            app:entries="@array/preference_color"
+            app:entryValues="@array/preference_color_value"
+            app:key="color"
+            app:title="@string/preference_color"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 </PreferenceScreen>
