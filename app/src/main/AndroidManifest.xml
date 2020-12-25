@@ -23,7 +23,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.MusicPlayerService">
+        <activity android:name=".ui.PreferenceActivity" />
+
+        <service
+            android:name=".service.MusicPlayerService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

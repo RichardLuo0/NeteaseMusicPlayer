@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -24,7 +23,8 @@ import androidx.media.session.MediaButtonReceiver;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.ui.MainActivity;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+
+import java.io.IOException;
 
 public class MediaNotification {
     private final static String CHANNEL_ID = "MEDIA_PLAY";
@@ -53,7 +53,7 @@ public class MediaNotification {
                 super.onPlaybackStateChanged(state);
                 boolean realPlayingState = state.getState() == PlaybackStateCompat.STATE_PLAYING;
                 if (isPlaying != realPlayingState) {
-                    updateNotification(context, state.getState() == PlaybackStateCompat.STATE_PLAYING);
+                    updateNotification(context, realPlayingState);
                     isPlaying = realPlayingState;
                 }
             }
@@ -61,7 +61,7 @@ public class MediaNotification {
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
                 super.onMetadataChanged(metadata);
-                updateNotification(context, false);
+                updateNotification(context, isPlaying);
             }
         });
     }
@@ -73,26 +73,16 @@ public class MediaNotification {
         MediaDescriptionCompat description = controller.getMetadata().getDescription();
         Uri descriptionUri = description.getIconUri();
         if (descriptionUri != null && !descriptionUri.equals(iconUri)) {
-            Target target = new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    iconBitmap = bitmap;
+            new Thread(() -> {
+                try {
+                    iconBitmap = Picasso.get().load(descriptionUri).get();
+                    iconUri = descriptionUri;
                     createNotification(context, iconBitmap, isPlaying);
                     notificationManager.notify(NOTIFICATION_ID, notification);
-                    iconUri = description.getIconUri();
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                } catch (IOException e) {
                     Logger.error("Icon uri load fail", e);
                 }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            };
-            Picasso.get().load(description.getIconUri()).into(target);
+            }).start();
         }
         createNotification(context, iconBitmap, isPlaying);
         notificationManager.notify(NOTIFICATION_ID, notification);
@@ -105,7 +95,7 @@ public class MediaNotification {
                 .setContentText(description.getSubtitle())
                 .setLargeIcon(bitmap != null ? bitmap : description.getIconBitmap())
                 .setStyle(mediaStyle)
-                .setSmallIcon(R.drawable.ic_round_music_note)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentIntent(PendingIntent
                         .getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(new androidx.core.app.NotificationCompat.Action(
@@ -118,7 +108,7 @@ public class MediaNotification {
                         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PLAY_PAUSE)))
                 .addAction(new androidx.core.app.NotificationCompat.Action(
                         R.drawable.ic_outline_skip_next,
-                        "pre",
+                        "next",
                         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)))
                 .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
                         PlaybackStateCompat.ACTION_STOP))

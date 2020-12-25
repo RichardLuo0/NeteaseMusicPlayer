@@ -1,6 +1,19 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="music">Music</string>
-    <string name="ablum">album</string>
+    <string name="album">Album</string>
     <string name="play_list">Play List</string>
+    <string name="preference_interface">Interface</string>
+    <string name="preference_navigation">Navigation style</string>
+    <string-array name="preference_navigation_style">
+        <item>Tab bar</item>
+        <item>Bottom navigation</item>
+        <item>Side bar</item>
+    </string-array>
+    <string-array name="preference_navigation_style_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="settings">Settings</string>
 </resources>

@@ -2,6 +2,14 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="music">音乐</string>
-    <string name="ablum">专辑</string>
+    <string name="album">专辑</string>
     <string name="play_list">播放列表</string>
+    <string name="preference_interface">界面</string>
+    <string name="preference_navigation">导航样式</string>
+    <string-array name="preference_navigation_style">
+        <item>标签栏</item>
+        <item>底部导航</item>
+        <item>侧边栏</item>
+    </string-array>
+    <string name="settings">设置</string>
 </resources>

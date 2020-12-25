@@ -1,10 +1,14 @@
 package com.richardluo.musicplayer.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Range;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -62,7 +66,7 @@ public class MainActivity extends BaseActivity {
     static class SectionsPagerAdapter extends FragmentPagerAdapter {
         private final Context mContext;
 
-        private final int[] tabs = new int[]{R.string.music, R.string.ablum, R.string.play_list};
+        private final int[] tabs = new int[]{R.string.music, R.string.album, R.string.play_list};
         private final Class<?>[] fragmentClass = new Class<?>[]{MusicFragment.class, AlbumFragment.class, PlayListFragment.class};
 
         public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -163,6 +167,22 @@ public class MainActivity extends BaseActivity {
             musicPlayerView.setMusic(music);
             musicPlayerView.play();
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.settings) {
+            startActivity(new Intent(this, PreferenceActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
