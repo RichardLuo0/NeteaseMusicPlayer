@@ -207,6 +207,10 @@ public class MusicPlayerView {
         else runnable.run(mediaController);
     }
 
+    public boolean isPlaying() {
+        return mediaController != null && mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING;
+    }
+
     protected long getDuration() {
         return mediaController.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
     }

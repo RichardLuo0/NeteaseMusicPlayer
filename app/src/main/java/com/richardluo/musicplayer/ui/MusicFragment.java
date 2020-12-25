@@ -87,8 +87,8 @@ public class MusicFragment extends Fragment {
                 holder.name.setText(music.getName());
                 if (music.getArtist() != null)
                     holder.artist.setText(music.getArtist().getName());
-                holder.imageView.setImage(music.getPicUrl(), R.drawable.ic_round_music_note, 1900, 1400);
-                holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(music));
+                holder.imageView.setImage(music.getPicUrl(), R.drawable.ic_round_music_note);
+                holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(music, true));
             }
 
             @Override

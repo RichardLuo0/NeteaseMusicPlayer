@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Range;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,7 +17,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.LiveData;
 import androidx.preference.PreferenceManager;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -26,10 +24,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.entity.Music;
@@ -37,11 +33,10 @@ import com.richardluo.musicplayer.ui.Adapter.SectionsPagerAdapter;
 import com.richardluo.musicplayer.ui.component.CustomBottomNavigationView;
 import com.richardluo.musicplayer.ui.component.CustomDrawer;
 import com.richardluo.musicplayer.ui.component.MusicPlayerView;
+import com.richardluo.musicplayer.ui.component.NetworkImageView;
 import com.richardluo.musicplayer.utils.UiUtils;
 import com.richardluo.musicplayer.viewModel.CustomViewModelProvider;
 import com.richardluo.musicplayer.viewModel.HomeViewModel;
-
-import java.util.Objects;
 
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
@@ -138,7 +133,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case 2:
                 findViewById(R.id.tabs).setVisibility(View.GONE);
-                ((CustomDrawer) findViewById(R.id.drawer)).setupWithViewPager(viewPager, tabNames, tabIcons);
+                CustomDrawer drawer = findViewById(R.id.drawer);
+                drawer.setupWithViewPager(viewPager, tabNames, tabIcons);
+                ((NetworkImageView) drawer.getHeaderView(0).findViewById(R.id.background)).setImage("https://api.dujin.org/bing/1366.php", R.drawable.ic_round_music_note);
                 viewPager.setOrientation(ViewPager2.ORIENTATION_VERTICAL);
                 viewPager.setUserInputEnabled(false);
                 break;
@@ -208,7 +205,8 @@ public class MainActivity extends BaseActivity {
             else
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             musicPlayerView.setMusic(music);
-            musicPlayerView.play();
+            if (viewModel.consumeRequestPlayNow())
+                musicPlayerView.play();
         });
     }
 
