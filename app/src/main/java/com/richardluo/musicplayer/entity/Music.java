@@ -1,21 +1,18 @@
 package com.richardluo.musicplayer.entity;
 
-import com.richardluo.musicplayer.model.Callback;
-import com.richardluo.musicplayer.model.NeteaseService;
-import com.richardluo.musicplayer.utils.RunnableWithArg;
+import com.google.gson.annotations.SerializedName;
 import com.richardluo.musicplayer.utils.UiUtils;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Music implements Serializable, UiUtils.Identifiable {
-    int id;
+public class Music extends Playable implements Serializable, UiUtils.Identifiable {
     String name;
     String picUrl;
     int popularity;
     Song song;
-    String playUrl;
 
+    @Override
     public int getId() {
         return id;
     }
@@ -34,19 +31,7 @@ public class Music implements Serializable, UiUtils.Identifiable {
         return null;
     }
 
-    public void getPlayUrl(RunnableWithArg<String> callback) {
-        if (playUrl != null)
-            callback.run(playUrl);
-        else
-            NeteaseService.getInstance().getMusicPlayUrl(id).enqueue(new Callback<MusicPlayUrl[]>() {
-                @Override
-                public void onResponse(MusicPlayUrl[] musicPlayUrls) {
-                    playUrl = musicPlayUrls[0].url;
-                    callback.run(playUrl);
-                }
-            });
-    }
-
+    @Override
     public long getDuration() {
         return song.duration;
     }
@@ -54,9 +39,13 @@ public class Music implements Serializable, UiUtils.Identifiable {
     public static class MusicPlayUrl {
         protected String url;
     }
+
+    public static class Song implements Serializable {
+        List<Artist> artists;
+
+        @SerializedName(value = "duration", alternate = {"dt"})
+        long duration;
+    }
 }
 
-class Song implements Serializable {
-    List<Artist> artists;
-    long duration;
-}
+

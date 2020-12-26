@@ -177,20 +177,15 @@ public class MusicPlayerView {
         });
     }
 
-    private Music music;
-
-    public void setMusic(Music music) {
-        if (music != null && this.music != music) {
-            this.music = music;
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("music", music);
-            music.getPlayUrl(url -> {
-                RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().prepareFromUri(Uri.parse(url), bundle);
-                if (mediaController == null)
-                    pendingControl.add(runnable);
-                else runnable.run(mediaController);
-            });
-        }
+    public synchronized void setMusic(Music music) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("music", music);
+        music.getPlayUrl(url -> {
+            RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().prepareFromUri(Uri.parse(url), bundle);
+            if (mediaController == null)
+                pendingControl.add(runnable);
+            else runnable.run(mediaController);
+        });
     }
 
     public void play() {
@@ -221,8 +216,10 @@ public class MusicPlayerView {
     }
 
     public void start() {
-        if (mediaController != null)
+        if (mediaController != null) {
             mediaController.registerCallback(controllerCallback);
+            controllerCallback.onPlaybackStateChanged(mediaController.getPlaybackState());
+        }
     }
 
     public void resume(Activity activity) {

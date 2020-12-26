@@ -27,6 +27,10 @@
             android:name=".ui.PreferenceActivity"
             android:parentActivityName=".ui.MainActivity" />
 
+        <activity
+            android:name=".ui.AlbumDetailActivity"
+            android:parentActivityName=".ui.MainActivity" />
+
         <service
             android:name=".service.MusicPlayerService"
             android:exported="false">

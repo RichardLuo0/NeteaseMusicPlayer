@@ -28,7 +28,7 @@ public class NetworkImageView extends ShapeableImageView {
     }
 
     public void setImage(String url, int placeholder) {
-        getImage(url, placeholder).fit().into(this);
+        getImage(url, placeholder).fit().centerCrop().into(this);
     }
 
     private RequestCreator getImage(Uri uri, int placeholder) {
@@ -36,7 +36,7 @@ public class NetworkImageView extends ShapeableImageView {
     }
 
     public void setImage(Uri uri, int placeholder) {
-        getImage(uri, placeholder).fit().into(this);
+        getImage(uri, placeholder).fit().centerCrop().into(this);
     }
 
     private RequestCreator getImage(int id, int placeholder) {
@@ -44,6 +44,6 @@ public class NetworkImageView extends ShapeableImageView {
     }
 
     public void setImage(int id, int placeholder) {
-        getImage(id, placeholder).fit().into(this);
+        getImage(id, placeholder).fit().centerCrop().into(this);
     }
 }

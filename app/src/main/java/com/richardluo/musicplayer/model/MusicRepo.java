@@ -2,6 +2,7 @@ package com.richardluo.musicplayer.model;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.richardluo.musicplayer.entity.Album;
 import com.richardluo.musicplayer.entity.Music;
 
 import java.util.List;
@@ -12,6 +13,15 @@ public class MusicRepo {
             @Override
             public void onResponse(List<Music> musicList1) {
                 musicList.postValue(musicList1);
+            }
+        });
+    }
+
+    public void getAlbum(MutableLiveData<List<Album>> albumList) {
+        NeteaseService.getInstance().getNewAlbum().enqueue(new Callback<List<Album>>() {
+            @Override
+            public void onResponse(List<Album> albumList1) {
+                albumList.postValue(albumList1);
             }
         });
     }

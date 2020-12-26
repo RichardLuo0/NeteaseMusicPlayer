@@ -1,6 +1,7 @@
 package com.richardluo.musicplayer.model;
 
 import com.google.gson.Gson;
+import com.richardluo.musicplayer.entity.Album;
 import com.richardluo.musicplayer.entity.Music;
 
 import java.io.IOException;
@@ -51,6 +52,12 @@ public class NeteaseService {
 
         @GET("/song/url")
         Call<Result<Music.MusicPlayUrl[]>> getMusicPlayUrl(@Query("id") int id);
+
+        @GET("/album/newest")
+        Call<Result<List<Album>>> getNewAlbum();
+
+        @GET("/album")
+        Call<Result<List<Album.AlbumSong>>> getAlbumSongs(@Query("id") int id);
     }
 }
 

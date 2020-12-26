@@ -1,12 +1,14 @@
 package com.richardluo.musicplayer.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Result<T> {
     int code;
-    int category;
-    T result;
+
+    @SerializedName(value = "data", alternate = {"result", "albums", "songs"})
     T data;
 
     public T getData() {
-        return result == null ? data : result;
+        return data;
     }
 }

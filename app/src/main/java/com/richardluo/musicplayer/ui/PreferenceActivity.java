@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.richardluo.musicplayer.R;
+import com.richardluo.musicplayer.ui.component.BaseActivity;
 
 import java.util.Objects;
 

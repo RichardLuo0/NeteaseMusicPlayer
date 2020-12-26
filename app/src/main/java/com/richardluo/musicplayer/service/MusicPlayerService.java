@@ -6,7 +6,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -168,9 +167,11 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
     }
 
     protected void setMusic(Music music, Uri uri) {
-        playQueue.clear();
-        playQueue.add(music);
-        exoPlayer.setMediaItem(MediaItem.fromUri(uri));
+        if (playQueue.peek() == null || playQueue.peek().getId() != music.getId()) {
+            playQueue.clear();
+            playQueue.add(music);
+            exoPlayer.setMediaItem(MediaItem.fromUri(uri));
+        }
         setMetadata(music);
     }
 

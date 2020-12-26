@@ -17,6 +17,10 @@ public class PlayListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_playlist, container, false);
+
+        ((MainActivity) requireActivity()).getAddButton().setOnClickListener(v -> {
+
+        });
         return root;
     }
 }

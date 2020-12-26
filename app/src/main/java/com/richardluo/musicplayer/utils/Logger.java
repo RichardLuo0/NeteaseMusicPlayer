@@ -27,6 +27,7 @@ public class Logger {
 
     public static void warn(String s) {
         Log.w(TAG, "warn: " + s);
+        error.postValue(s);
     }
 
     public static void warn(String s, Throwable t) {
@@ -36,5 +37,6 @@ public class Logger {
 
     public static void info(String s) {
         Log.i(TAG, "info: " + s);
+        error.postValue(s);
     }
 }
