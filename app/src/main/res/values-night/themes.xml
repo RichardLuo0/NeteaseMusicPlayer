@@ -13,7 +13,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="Theme.MusicPlayer.AppBar" parent="Widget.MaterialComponents.Toolbar">
+    <style name="Theme.MusicPlayer.AppBar" parent="Theme.MusicPlayer">
         <item name="android:background">@android:color/black</item>
     </style>
 </resources>

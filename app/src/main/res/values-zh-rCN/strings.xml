@@ -15,4 +15,5 @@
     <string name="preference_color">主题色</string>
     <string name="drawer_open">打开</string>
     <string name="drawer_close">关闭</string>
+    <string name="create_play_list">创建播放列表</string>
 </resources>

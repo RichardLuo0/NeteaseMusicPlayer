@@ -22,7 +22,7 @@ public class Music extends Playable implements Serializable, UiUtils.Identifiabl
     }
 
     public String getPicUrl() {
-        return picUrl.replace("http", "https");
+        return picUrl.replace("http", "https") + "?param=200y200";
     }
 
     public Artist getArtist() {

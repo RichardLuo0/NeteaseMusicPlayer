@@ -1,4 +1,4 @@
-package com.richardluo.musicplayer.model;
+package com.richardluo.musicplayer.repository;
 
 import com.google.gson.Gson;
 import com.richardluo.musicplayer.entity.Album;

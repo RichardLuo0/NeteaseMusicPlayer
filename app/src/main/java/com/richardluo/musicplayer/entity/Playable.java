@@ -1,7 +1,7 @@
 package com.richardluo.musicplayer.entity;
 
-import com.richardluo.musicplayer.model.Callback;
-import com.richardluo.musicplayer.model.NeteaseService;
+import com.richardluo.musicplayer.repository.Callback;
+import com.richardluo.musicplayer.repository.NeteaseService;
 import com.richardluo.musicplayer.utils.RunnableWithArg;
 
 import java.io.Serializable;

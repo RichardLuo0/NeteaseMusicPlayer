@@ -100,7 +100,7 @@ public class AlbumDetailActivity extends BottomSheetMusicPlayerActivity {
                         holder.needMoneyView.setVisibility(View.VISIBLE);
                         holder.root.setOnClickListener(v -> Logger.info(song.getName() + "为付费歌曲!"));
                     } else
-                        holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(song.toMusic(album.getPicUrl(), album.getArtist()), true));
+                        holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(song.toMusic(album), true));
                 }
             });
             songList.postValue(songs);

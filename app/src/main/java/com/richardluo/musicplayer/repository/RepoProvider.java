@@ -1,8 +1,7 @@
-package com.richardluo.musicplayer.model;
+package com.richardluo.musicplayer.repository;
 
 import android.util.Log;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class RepoProvider {

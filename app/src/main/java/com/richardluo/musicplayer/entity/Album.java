@@ -1,8 +1,8 @@
 package com.richardluo.musicplayer.entity;
 
 import com.google.gson.annotations.SerializedName;
-import com.richardluo.musicplayer.model.Callback;
-import com.richardluo.musicplayer.model.NeteaseService;
+import com.richardluo.musicplayer.repository.Callback;
+import com.richardluo.musicplayer.repository.NeteaseService;
 import com.richardluo.musicplayer.utils.RunnableWithArg;
 import com.richardluo.musicplayer.utils.UiUtils;
 
@@ -25,7 +25,7 @@ public class Album implements UiUtils.Identifiable, Serializable {
     }
 
     public String getPicUrl() {
-        return blurPicUrl;
+        return blurPicUrl.replace("http", "https") + "?param=200y200";
     }
 
     public Artist getArtist() {
@@ -80,9 +80,9 @@ public class Album implements UiUtils.Identifiable, Serializable {
             return fee;
         }
 
-        public Music toMusic(String picUrl, Artist artist) {
-            this.picUrl = picUrl;
-            this.artist = artist;
+        public Music toMusic(Album album) {
+            this.picUrl = album.blurPicUrl;
+            this.artist = album.artist;
             return this;
         }
     }

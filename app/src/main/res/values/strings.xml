@@ -31,4 +31,5 @@
     </string-array>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="create_play_list">Create play list</string>
 </resources>

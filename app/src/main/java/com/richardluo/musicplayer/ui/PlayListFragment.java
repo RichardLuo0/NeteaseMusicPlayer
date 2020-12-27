@@ -10,6 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.richardluo.musicplayer.R;
+import com.richardluo.musicplayer.ui.component.EditTextDialogBuilder;
+
+import java.util.Objects;
 
 public class PlayListFragment extends Fragment {
 
@@ -19,7 +22,9 @@ public class PlayListFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_playlist, container, false);
 
         ((MainActivity) requireActivity()).getAddButton().setOnClickListener(v -> {
-
+            new EditTextDialogBuilder(requireContext()).setTitle(R.string.create_play_list).setCallBack(getLayoutInflater(), text -> {
+                return true;
+            }).setHint(R.string.play_list).show();
         });
         return root;
     }
