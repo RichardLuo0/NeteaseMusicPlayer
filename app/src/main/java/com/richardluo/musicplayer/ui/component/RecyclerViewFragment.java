@@ -96,14 +96,14 @@ public abstract class RecyclerViewFragment<T extends UiUtils.Identifiable> exten
     }
 
     private void refreshData(RecyclerView grid) {
-        TransitionManager.beginDelayedTransition(refreshLayout, sharedAxis);
+        TransitionManager.beginDelayedTransition(grid, sharedAxis);
         grid.setVisibility(View.INVISIBLE);
         onRefreshData();
         refreshLayout.setRefreshing(true);
     }
 
     private void onDataReady(RecyclerView grid) {
-        TransitionManager.beginDelayedTransition(refreshLayout, sharedAxis);
+        TransitionManager.beginDelayedTransition(grid, sharedAxis);
         grid.setVisibility(View.VISIBLE);
         refreshLayout.setRefreshing(false);
     }

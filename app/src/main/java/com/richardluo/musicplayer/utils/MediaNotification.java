@@ -25,6 +25,8 @@ import com.richardluo.musicplayer.ui.MainActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MediaNotification {
     private final static String CHANNEL_ID = "MEDIA_PLAY";
@@ -69,11 +71,13 @@ public class MediaNotification {
     private Uri iconUri;
     private Bitmap iconBitmap;
 
+    private final Executor executor = Executors.newSingleThreadExecutor();
+
     private void updateNotification(Context context, boolean isPlaying) {
         MediaDescriptionCompat description = controller.getMetadata().getDescription();
         Uri descriptionUri = description.getIconUri();
         if (descriptionUri != null && !descriptionUri.equals(iconUri)) {
-            new Thread(() -> {
+            executor.execute(() -> {
                 try {
                     iconBitmap = Picasso.get().load(descriptionUri).get();
                     iconUri = descriptionUri;
@@ -82,7 +86,7 @@ public class MediaNotification {
                 } catch (IOException e) {
                     Logger.error("Icon uri load fail", e);
                 }
-            }).start();
+            });
         }
         createNotification(context, iconBitmap, isPlaying);
         notificationManager.notify(NOTIFICATION_ID, notification);

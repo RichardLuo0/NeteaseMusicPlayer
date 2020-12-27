@@ -3,14 +3,14 @@ package com.richardluo.musicplayer.viewModel;
 import androidx.activity.ComponentActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.richardluo.musicplayer.entity.Music;
+import com.richardluo.musicplayer.entity.Playable;
+import com.richardluo.musicplayer.utils.CustomLiveData;
 
 public class HomeViewModel extends ViewModel {
 
-    private final MutableLiveData<Music> playingMusic = new MutableLiveData<>();
+    private final CustomLiveData<Playable> playingMusic = new CustomLiveData<>();
     private boolean requestPlayNow = false;
 
     private static HomeViewModel instance;
@@ -33,12 +33,12 @@ public class HomeViewModel extends ViewModel {
         return instance;
     }
 
-    public void setPlayingMusic(Music music, boolean requestPlayNow) {
-        if (playingMusic.getValue() != music) playingMusic.postValue(music);
+    public void setPlayingMusic(Playable playable, boolean requestPlayNow) {
+        if (playingMusic.getValue() != playable) playingMusic.postValue(playable);
         this.requestPlayNow = requestPlayNow;
     }
 
-    public LiveData<Music> getPlayingMusic() {
+    public LiveData<Playable> getPlayingMusic() {
         return playingMusic;
     }
 

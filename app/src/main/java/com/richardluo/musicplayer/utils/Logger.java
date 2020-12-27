@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 public class Logger {
-    private static final String TAG = "Music Player";
+    private static final String TAG = "Playable Player";
 
     private static final MutableLiveData<String> error = new MutableLiveData<>();
 

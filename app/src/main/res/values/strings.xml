@@ -32,4 +32,9 @@
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="create_play_list">Create play list</string>
+    <string name="songs">songs</string>
+    <string name="delete_play_list">Delete play list</string>
+    <string name="confirm">Confirm?</string>
+    <string name="add_to_play_list">Add to play list</string>
+    <string name="remove_from_play_list">Remove from play list</string>
 </resources>

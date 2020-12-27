@@ -2,6 +2,7 @@ package com.richardluo.musicplayer.repository;
 
 import com.google.gson.Gson;
 import com.richardluo.musicplayer.entity.Album;
+import com.richardluo.musicplayer.entity.Playable;
 import com.richardluo.musicplayer.entity.Music;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ import retrofit2.internal.EverythingIsNonNull;
 
 
 public class NeteaseService {
-    public final static String SERVER_ADDRESS = "http://10.0.2.2:3000";
+    public final static String SERVER_ADDRESS = "http://192.168.137.1:3000";
 
     private static INeteaseService instance;
 
@@ -51,7 +52,7 @@ public class NeteaseService {
         Call<Result<List<Music>>> getNewMusic();
 
         @GET("/song/url")
-        Call<Result<Music.MusicPlayUrl[]>> getMusicPlayUrl(@Query("id") int id);
+        Call<Result<Playable.MusicPlayUrl[]>> getMusicPlayUrl(@Query("id") int id);
 
         @GET("/album/newest")
         Call<Result<List<Album>>> getNewAlbum();

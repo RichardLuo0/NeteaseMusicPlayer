@@ -1,15 +1,14 @@
 package com.richardluo.musicplayer.entity;
 
 import com.google.gson.annotations.SerializedName;
-import com.richardluo.musicplayer.utils.UiUtils;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Music extends Playable implements Serializable, UiUtils.Identifiable {
-    String name;
-    String picUrl;
-    int popularity;
+public class Music extends Playable {
+    public String name;
+    public String picUrl;
+    public int popularity;
     Song song;
 
     @Override
@@ -17,14 +16,17 @@ public class Music extends Playable implements Serializable, UiUtils.Identifiabl
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getPicUrl() {
         return picUrl.replace("http", "https") + "?param=200y200";
     }
 
+    @Override
     public Artist getArtist() {
         if (song.artists.size() > 0)
             return song.artists.get(0);
@@ -36,8 +38,16 @@ public class Music extends Playable implements Serializable, UiUtils.Identifiabl
         return song.duration;
     }
 
-    public static class MusicPlayUrl {
-        protected String url;
+    public Album.AlbumSong toAlbumSong() {
+        Album.AlbumSong song = new Album.AlbumSong();
+        song.id = id;
+        song.playUrl = playUrl;
+        song.name = name;
+        song.picUrl = picUrl;
+        song.artist = this.song.artists.get(0);
+        song.fee = 0;
+        song.duration = getDuration();
+        return song;
     }
 
     public static class Song implements Serializable {
@@ -47,5 +57,3 @@ public class Music extends Playable implements Serializable, UiUtils.Identifiabl
         long duration;
     }
 }
-
-

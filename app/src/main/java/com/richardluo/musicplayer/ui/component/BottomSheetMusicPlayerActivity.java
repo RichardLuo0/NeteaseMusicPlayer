@@ -2,12 +2,10 @@ package com.richardluo.musicplayer.ui.component;
 
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Range;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -15,8 +13,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.richardluo.musicplayer.R;
-import com.richardluo.musicplayer.entity.Music;
-import com.richardluo.musicplayer.utils.UiUtils;
+import com.richardluo.musicplayer.entity.Playable;
 import com.richardluo.musicplayer.viewModel.HomeViewModel;
 
 public abstract class BottomSheetMusicPlayerActivity extends BaseActivity {
@@ -78,7 +75,7 @@ public abstract class BottomSheetMusicPlayerActivity extends BaseActivity {
         View miniPlayer = findViewById(R.id.mini_player);
         View expandPlayer = findViewById(R.id.expand_player);
         musicPlayerView = new MusicPlayerView(this, miniPlayer, expandPlayer);
-        LiveData<Music> playingMusic = getHomeViewModel().getPlayingMusic();
+        LiveData<Playable> playingMusic = getHomeViewModel().getPlayingMusic();
         if (playingMusic.getValue() == null)
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         playingMusic.observe(this, music -> {

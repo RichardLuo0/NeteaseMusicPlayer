@@ -1,6 +1,7 @@
 package com.richardluo.musicplayer.ui;
 
 import android.os.Bundle;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +10,11 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.richardluo.musicplayer.R;
 import com.richardluo.musicplayer.entity.Album;
 import com.richardluo.musicplayer.ui.component.BottomSheetMusicPlayerActivity;
@@ -23,15 +24,15 @@ import com.richardluo.musicplayer.utils.UiUtils;
 import com.richardluo.musicplayer.utils.UnixTimeFormat;
 import com.richardluo.musicplayer.viewModel.HomeViewModel;
 
-import java.util.List;
 import java.util.Objects;
 
 public class AlbumDetailActivity extends BottomSheetMusicPlayerActivity {
 
     HomeViewModel homeViewModel;
 
-    MutableLiveData<List<Album.AlbumSong>> songList = new MutableLiveData<>();
     Album album;
+
+    private final MaterialSharedAxis sharedAxis = new MaterialSharedAxis(MaterialSharedAxis.Y, true);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,7 +48,10 @@ public class AlbumDetailActivity extends BottomSheetMusicPlayerActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         appBar.setTitle(album.getName());
 
-        ((NetworkImageView) findViewById(R.id.background)).setImage(album.getPicUrl(), R.drawable.ic_round_music_note);
+        NetworkImageView background = findViewById(R.id.background);
+        if (album.hasPic())
+            background.setImage(album.getPicUrl(), R.drawable.ic_round_music_note);
+        else background.setImage(R.drawable.ic_round_music_note);
 
         initSongList();
         initPlayer();
@@ -82,28 +86,36 @@ public class AlbumDetailActivity extends BottomSheetMusicPlayerActivity {
 
     public void initSongList() {
         RecyclerView recyclerView = findViewById(R.id.list);
-        album.getSongs(songs -> {
-            UiUtils.bindRecyclerViewViewWithLiveData(this, recyclerView, songList, new UiUtils.Bindable<SongViewHolder, Album.AlbumSong>() {
-                @Override
-                protected SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                    View v = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.song_item, parent, false);
-                    return new SongViewHolder(v);
-                }
+        UiUtils.bindRecyclerViewViewWithLiveData(this, recyclerView, album.getSongs(), new UiUtils.Bindable<SongViewHolder, Album.AlbumSong>() {
+            @Override
+            protected SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.song_item, parent, false);
+                return new SongViewHolder(v);
+            }
 
-                @Override
-                protected void bind(@NonNull SongViewHolder holder, Album.AlbumSong song) {
-                    holder.orderView.setText(String.valueOf(song.getNo()));
-                    holder.titleView.setText(song.getName());
-                    holder.artistView.setText(UnixTimeFormat.format(song.getDuration()));
-                    if (song.getFee() > 0) {
-                        holder.needMoneyView.setVisibility(View.VISIBLE);
-                        holder.root.setOnClickListener(v -> Logger.info(song.getName() + "为付费歌曲!"));
-                    } else
-                        holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(song.toMusic(album), true));
-                }
-            });
-            songList.postValue(songs);
+            @Override
+            protected void bind(@NonNull SongViewHolder holder, Album.AlbumSong song) {
+                bindViewHolder(holder, song);
+            }
+
+            @Override
+            protected void onUpdate() {
+                super.onUpdate();
+                TransitionManager.beginDelayedTransition(recyclerView, sharedAxis);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
         });
+    }
+
+    protected void bindViewHolder(@NonNull SongViewHolder holder, Album.AlbumSong song) {
+        holder.orderView.setText(String.valueOf(song.getNo()));
+        holder.titleView.setText(song.getName());
+        holder.artistView.setText(UnixTimeFormat.format(song.getDuration()));
+        if (song.getFee() > 0) {
+            holder.needMoneyView.setVisibility(View.VISIBLE);
+            holder.root.setOnClickListener(v -> Logger.info(song.getName() + "为付费歌曲!"));
+        } else
+            holder.root.setOnClickListener(v -> homeViewModel.setPlayingMusic(song.toMusic(album), true));
     }
 }

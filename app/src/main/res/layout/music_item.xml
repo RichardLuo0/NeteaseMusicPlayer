@@ -14,8 +14,7 @@
         <com.richardluo.musicplayer.ui.component.NetworkImageView
             android:id="@+id/music_image"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:scaleType="centerCrop" />
+            android:layout_height="150dp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/music_name"

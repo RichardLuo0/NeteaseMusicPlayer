@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.imageview.ShapeableImageView;
@@ -13,14 +14,17 @@ import com.squareup.picasso.RequestCreator;
 public class NetworkImageView extends ShapeableImageView {
     public NetworkImageView(Context context) {
         super(context);
+        setScaleType(ScaleType.CENTER_CROP);
     }
 
     public NetworkImageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setScaleType(ScaleType.CENTER_CROP);
     }
 
     public NetworkImageView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setScaleType(ScaleType.CENTER_CROP);
     }
 
     private RequestCreator getImage(String url, int placeholder) {
@@ -45,5 +49,9 @@ public class NetworkImageView extends ShapeableImageView {
 
     public void setImage(int id, int placeholder) {
         getImage(id, placeholder).fit().centerCrop().into(this);
+    }
+
+    public void setImage(@DrawableRes int id) {
+        setImageResource(id);
     }
 }

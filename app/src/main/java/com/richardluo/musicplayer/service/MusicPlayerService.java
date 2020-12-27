@@ -25,17 +25,17 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.richardluo.musicplayer.entity.Music;
+import com.richardluo.musicplayer.entity.Playable;
 import com.richardluo.musicplayer.utils.MediaNotification;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 public class MusicPlayerService extends MediaBrowserServiceCompat {
 
     private final static String LOG_TAG = "MusicPlayerService";
     private final static String ROOT_ID = "root";
+    private final static int PLAY_LIST_SIZE = 10;
 
     private final MusicPlayerService service = this;
     private MediaSessionCompat mediaSession;
@@ -44,7 +44,8 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
 
     private ExoPlayer exoPlayer;
     private MediaNotification mediaNotification;
-    private final Queue<Music> playQueue = new LinkedList<>();
+    private int playingIndex = 0;
+    private final ArrayList<PlayableAndMediaItem> playQueue = new ArrayList<>();
 
     MediaSessionCompat.Callback mediaSessionCallback = new MediaSessionCompat.Callback() {
         AudioFocusRequestCompat audioFocusRequest;
@@ -59,10 +60,10 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
                         onPause();
                     else onPlay();
                     break;
-                case KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD:
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
                     onSkipToNext();
                     break;
-                case KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD:
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                     onSkipToPrevious();
                     break;
             }
@@ -72,8 +73,8 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onPrepareFromUri(Uri uri, Bundle extras) {
             super.onPrepareFromUri(uri, extras);
-            Music music = (Music) extras.getSerializable("music");
-            setMusic(music, uri);
+            Playable playable = (Playable) extras.getSerializable("playable");
+            setMusic(playable, MediaItem.fromUri(uri));
         }
 
         @Override
@@ -114,6 +115,20 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSeekTo(long pos) {
             exoPlayer.seekTo(pos);
+        }
+
+        @Override
+        public void onSkipToNext() {
+            if (playQueue.size() > playingIndex + 1) {
+                setPlayingIndex(playingIndex + 1);
+            }
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            if (playingIndex - 1 >= 0) {
+                setPlayingIndex(playingIndex - 1);
+            }
         }
     };
 
@@ -160,27 +175,28 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    protected void addMusic(Music music, Uri uri) {
-        playQueue.add(music);
-        exoPlayer.addMediaItem(MediaItem.fromUri(uri));
-        setMetadata(music);
-    }
-
-    protected void setMusic(Music music, Uri uri) {
-        if (playQueue.peek() == null || playQueue.peek().getId() != music.getId()) {
-            playQueue.clear();
-            playQueue.add(music);
-            exoPlayer.setMediaItem(MediaItem.fromUri(uri));
+    protected void setMusic(Playable playable, MediaItem mediaItem) {
+        if (playQueue.size() == 0 || playQueue.get(playingIndex) == null || playQueue.get(playingIndex).playable.getId() != playable.getId()) {
+            playQueue.add(new PlayableAndMediaItem(playable, mediaItem));
+            if (playQueue.size() > PLAY_LIST_SIZE)
+                playQueue.remove(0);
+            setPlayingIndex(playQueue.size() - 1);
         }
-        setMetadata(music);
+        setMetadata(playable);
     }
 
-    protected void setMetadata(Music music) {
+    public void setPlayingIndex(int playingIndex) {
+        this.playingIndex = playingIndex;
+        exoPlayer.setMediaItem(playQueue.get(playingIndex).mediaItem);
+        setMetadata(playQueue.get(playingIndex).playable);
+    }
+
+    protected void setMetadata(Playable playable) {
         mediaSession.setMetadata(metadataBuilder
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, music.getName())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, music.getArtist().getName())
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, String.valueOf(Uri.parse(music.getPicUrl())))
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, music.getDuration())
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playable.getName())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, playable.getArtist().getName())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, String.valueOf(Uri.parse(playable.getPicUrl())))
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, playable.getDuration())
                 .build());
     }
 
@@ -196,7 +212,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
         mediaNotification.startForeground(this);
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
         exoPlayer.prepare();
-        exoPlayer.play();
+        exoPlayer.setPlayWhenReady(true);
     }
 
     public void pause() {
@@ -206,7 +222,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
     }
 
     public void stop() {
-        stopForeground(false);
+        stopForeground(true);
         exoPlayer.stop();
     }
 

@@ -9,6 +9,9 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 
+import com.richardluo.musicplayer.repository.AppDatabase;
+import com.richardluo.musicplayer.repository.MusicRepo;
+import com.richardluo.musicplayer.repository.RepoProvider;
 import com.richardluo.musicplayer.utils.CustomLiveData;
 import com.richardluo.musicplayer.utils.Logger;
 
@@ -25,6 +28,9 @@ public class App extends Application {
         Logger.addOnException(e -> Toast.makeText(this, e, Toast.LENGTH_SHORT).show());
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+
+        // init repository
+        RepoProvider.get(MusicRepo.class).setAppDatabase(AppDatabase.get(this));
     }
 
     @Override

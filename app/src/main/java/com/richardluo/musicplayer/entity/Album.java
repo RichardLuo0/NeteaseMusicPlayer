@@ -1,20 +1,31 @@
 package com.richardluo.musicplayer.entity;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 import com.richardluo.musicplayer.repository.Callback;
 import com.richardluo.musicplayer.repository.NeteaseService;
-import com.richardluo.musicplayer.utils.RunnableWithArg;
 import com.richardluo.musicplayer.utils.UiUtils;
 
 import java.io.Serializable;
 import java.util.List;
 
+import static androidx.room.ForeignKey.CASCADE;
+
 public class Album implements UiUtils.Identifiable, Serializable {
-    int id;
-    String name;
-    String blurPicUrl;
-    Artist artist;
-    List<AlbumSong> songs;
+    @PrimaryKey(autoGenerate = true)
+    public int id;
+    public String name;
+    public String blurPicUrl;
+    @Embedded(prefix = "artist_")
+    public Artist artist;
 
     public int getId() {
         return id;
@@ -22,6 +33,10 @@ public class Album implements UiUtils.Identifiable, Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public boolean hasPic() {
+        return blurPicUrl != null;
     }
 
     public String getPicUrl() {
@@ -32,26 +47,36 @@ public class Album implements UiUtils.Identifiable, Serializable {
         return artist;
     }
 
-    public void getSongs(RunnableWithArg<List<AlbumSong>> callback) {
-        if (songs != null && !songs.isEmpty())
-            callback.run(songs);
-        else
+    @Ignore
+    protected LiveData<List<AlbumSong>> songs;
+
+    public LiveData<List<AlbumSong>> getSongs() {
+        if (songs == null || songs.getValue() == null) {
+            songs = new MutableLiveData<>();
             NeteaseService.getInstance().getAlbumSongs(id).enqueue(new Callback<List<AlbumSong>>() {
                 @Override
                 public void onResponse(List<AlbumSong> songs1) {
-                    songs = songs1;
-                    callback.run(songs);
+                    ((MutableLiveData<List<AlbumSong>>) songs).postValue(songs1);
                 }
             });
+        }
+        return songs;
     }
 
-    public static class AlbumSong extends Music implements UiUtils.Identifiable {
-        int no;
-        Artist artist;
-        int fee;
+    @Entity(primaryKeys = {"id"},
+            indices = {@Index("albumId")},
+            foreignKeys = @ForeignKey(entity = PlayList.class, parentColumns = "id", childColumns = "albumId", onDelete = CASCADE))
+    public static class AlbumSong extends Playable implements UiUtils.Identifiable {
+        public int no;
+        public String name;
+        @Embedded(prefix = "artist_")
+        public Artist artist;
+        public int fee;
+        public int albumId;
+        public String picUrl;
 
         @SerializedName(value = "duration", alternate = {"dt"})
-        long duration;
+        public long duration;
 
         public int getNo() {
             return no;
@@ -59,6 +84,11 @@ public class Album implements UiUtils.Identifiable, Serializable {
 
         public String getName() {
             return name;
+        }
+
+        @Override
+        public String getPicUrl() {
+            return picUrl.replace("http", "https") + "?param=200y200";
         }
 
         @Override
@@ -80,9 +110,12 @@ public class Album implements UiUtils.Identifiable, Serializable {
             return fee;
         }
 
-        public Music toMusic(Album album) {
-            this.picUrl = album.blurPicUrl;
-            this.artist = album.artist;
+        public Playable toMusic(Album album) {
+            this.albumId = album.id;
+            if (this.picUrl == null) {
+                this.picUrl = album.blurPicUrl;
+                this.artist = album.artist;
+            }
             return this;
         }
     }

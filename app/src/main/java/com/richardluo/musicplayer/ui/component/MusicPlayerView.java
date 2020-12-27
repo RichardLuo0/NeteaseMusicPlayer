@@ -18,7 +18,7 @@ import android.widget.SeekBar;
 
 import com.google.android.material.textview.MaterialTextView;
 import com.richardluo.musicplayer.R;
-import com.richardluo.musicplayer.entity.Music;
+import com.richardluo.musicplayer.entity.Playable;
 import com.richardluo.musicplayer.service.MusicPlayerService;
 import com.richardluo.musicplayer.utils.RunnableWithArg;
 import com.richardluo.musicplayer.utils.UnixTimeFormat;
@@ -44,8 +44,6 @@ public class MusicPlayerView {
     private NetworkImageView playerImageView;
     private MaterialTextView playerTextView;
     private MaterialTextView playerArtistTextView;
-    private ImageButton playerSkipToPreButton;
-    private ImageButton playerSkipToNextButton;
     private ImageButton playerButton;
     private SeekBar playerProgressSlider;
     private MaterialTextView playerNowTimeView;
@@ -127,6 +125,9 @@ public class MusicPlayerView {
                 // Register callback to stay in sync
                 mediaController.registerCallback(controllerCallback);
 
+                controllerCallback.onPlaybackStateChanged(mediaController.getPlaybackState());
+                controllerCallback.onMetadataChanged(mediaController.getMetadata());
+
                 for (RunnableWithArg<MediaControllerCompat> runnable : pendingControl) {
                     runnable.run(mediaController);
                 }
@@ -147,8 +148,8 @@ public class MusicPlayerView {
         playerTextView = expandedPlayer.findViewById(R.id.player_name);
         playerArtistTextView = expandedPlayer.findViewById(R.id.player_artist);
         playerButton = expandedPlayer.findViewById(R.id.player_play_button);
-        playerSkipToPreButton = expandedPlayer.findViewById(R.id.player_skip_previous);
-        playerSkipToNextButton = expandedPlayer.findViewById(R.id.player_skip_next);
+        ImageButton playerSkipToPreButton = expandedPlayer.findViewById(R.id.player_skip_previous);
+        ImageButton playerSkipToNextButton = expandedPlayer.findViewById(R.id.player_skip_next);
         playerProgressSlider = expandedPlayer.findViewById(R.id.player_progress);
         playerNowTimeView = expandedPlayer.findViewById(R.id.player_now_time);
         playerEndTimeView = expandedPlayer.findViewById(R.id.player_end_time);
@@ -177,10 +178,10 @@ public class MusicPlayerView {
         });
     }
 
-    public synchronized void setMusic(Music music) {
+    public synchronized void setMusic(Playable playable) {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("music", music);
-        music.getPlayUrl(url -> {
+        bundle.putSerializable("playable", playable);
+        playable.getPlayUrl(url -> {
             RunnableWithArg<MediaControllerCompat> runnable = mediaController -> mediaController.getTransportControls().prepareFromUri(Uri.parse(url), bundle);
             if (mediaController == null)
                 pendingControl.add(runnable);
@@ -202,10 +203,6 @@ public class MusicPlayerView {
         else runnable.run(mediaController);
     }
 
-    public boolean isPlaying() {
-        return mediaController != null && mediaController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING;
-    }
-
     protected long getDuration() {
         return mediaController.getMetadata().getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
     }
@@ -219,6 +216,7 @@ public class MusicPlayerView {
         if (mediaController != null) {
             mediaController.registerCallback(controllerCallback);
             controllerCallback.onPlaybackStateChanged(mediaController.getPlaybackState());
+            controllerCallback.onMetadataChanged(mediaController.getMetadata());
         }
     }
 

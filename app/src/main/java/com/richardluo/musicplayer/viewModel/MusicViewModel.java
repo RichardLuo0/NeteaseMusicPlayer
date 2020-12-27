@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.richardluo.musicplayer.entity.Music;
+import com.richardluo.musicplayer.entity.Playable;
 import com.richardluo.musicplayer.repository.MusicRepo;
 import com.richardluo.musicplayer.repository.RepoProvider;
 

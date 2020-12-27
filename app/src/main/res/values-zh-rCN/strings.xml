@@ -16,4 +16,9 @@
     <string name="drawer_open">打开</string>
     <string name="drawer_close">关闭</string>
     <string name="create_play_list">创建播放列表</string>
+    <string name="songs">首歌曲</string>
+    <string name="delete_play_list">删除播放列表</string>
+    <string name="confirm">确认？</string>
+    <string name="add_to_play_list">添加到播放列表</string>
+    <string name="remove_from_play_list">从播放列表移除</string>
 </resources>
