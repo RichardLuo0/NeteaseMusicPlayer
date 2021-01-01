@@ -63,10 +63,11 @@ public class Album implements UiUtils.Identifiable, Serializable {
         return songs;
     }
 
-    @Entity(primaryKeys = {"id"},
-            indices = {@Index("albumId")},
+    @Entity(indices = {@Index("albumId")},
             foreignKeys = @ForeignKey(entity = PlayList.class, parentColumns = "id", childColumns = "albumId", onDelete = CASCADE))
     public static class AlbumSong extends Playable implements UiUtils.Identifiable {
+        @PrimaryKey(autoGenerate = true)
+        public int uniqueId;
         public int no;
         public String name;
         @Embedded(prefix = "artist_")

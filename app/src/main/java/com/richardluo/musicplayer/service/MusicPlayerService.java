@@ -236,19 +236,7 @@ public class MusicPlayerService extends MediaBrowserServiceCompat {
             return;
         if (exoPlayer.isPlaying()) {
             setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
-            //Schedule an update
-            int playbackState = exoPlayer == null ? Player.STATE_IDLE : exoPlayer.getPlaybackState();
-            long delayMs;
-            assert exoPlayer != null;
-            if (exoPlayer.getPlayWhenReady() && playbackState == Player.STATE_READY) {
-                delayMs = 1000 - (exoPlayer.getCurrentPosition() % 1000);
-                if (delayMs < 200) {
-                    delayMs += 1000;
-                }
-            } else {
-                delayMs = 1000;
-            }
-            handler.postDelayed(this::updateProgressBar, delayMs);
+            handler.postDelayed(this::updateProgressBar, 1000);
         } else {
             setPlaybackState(PlaybackStateCompat.STATE_PAUSED);
             isExisting = false;
